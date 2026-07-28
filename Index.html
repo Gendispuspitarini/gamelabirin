@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Labirin Simpel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #222;
+            color: #fff;
+            margin-top: 30px;
+        }
+        canvas {
+            border: 4px solid #fff;
+            background-color: #000;
+            display: block;
+            margin: 20px auto;
+        }
+        #status {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Game Labirin</h1>
+    <p>Gunakan **Tombol Panah** di keyboard untuk mencapai kotak HIJAU!</p>
+    <div id="status"></div>
+    <canvas id="mazeCanvas" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('mazeCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const tileSize = 40;
+        const rows = 10;
+        const cols = 10;
+
+        // Peta Labirin: 1 = Dinding, 0 = Jalan, 2 = Finish
+        const map = [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+            [1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+            [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+            [1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+            [1, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 1, 0, 1],
+            [1, 0, 0, 0, 0, 1, 0, 0, 2, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        ];
+
+        // Posisi Awal Pemain (Kolom 1, Baris 1)
+        let player = { x: 1, y: 1 };
+
+        function drawMap() {
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (map[r][c] === 1) {
+                        ctx.fillStyle = '#555'; // Dinding
+                    } else if (map[r][c] === 2) {
+                        ctx.fillStyle = '#4CAF50'; // Finish
+                    } else {
+                        ctx.fillStyle = '#000'; // Jalan
+                    }
+                    ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
+                }
+            }
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = '#FF5722'; // Warna Pemain (Oranye)
+            ctx.beginPath();
+            ctx.arc(
+                player.x * tileSize + tileSize / 2,
+                player.y * tileSize + tileSize / 2,
+                tileSize / 3,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+        }
+
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawMap();
+            drawPlayer();
+        }
+
+        window.addEventListener('keydown', (e) => {
+            let newX = player.x;
+            let newY = player.y;
+
+            if (e.key === 'ArrowUp') newY--;
+            if (e.key === 'ArrowDown') newY++;
+            if (e.key === 'ArrowLeft') newX--;
+            if (e.key === 'ArrowRight') newX++;
+
+            // Cek Tabrakan Dinding
+            if (map[newY][newX] !== 1) {
+                player.x = newX;
+                player.y = newY;
+            }
+
+            // Cek Kemenangan
+            if (map[player.y][player.x] === 2) {
+                document.getElementById('status').innerText = 'Selamat! Kamu Berhasil Keluar!';
+            }
+
+            update();
+        });
+
+        // Gambar pertama kali
+        update();
+    </script>
+</body>
+</html>
