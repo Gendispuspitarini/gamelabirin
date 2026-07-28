@@ -10,27 +10,68 @@
             text-align: center;
             background-color: #222;
             color: #fff;
-            margin-top: 30px;
+            margin: 0;
+            padding: 10px;
         }
         canvas {
             border: 4px solid #fff;
             background-color: #000;
             display: block;
-            margin: 20px auto;
+            margin: 10px auto;
+            max-width: 90vw;
+            height: auto;
         }
         #status {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             color: #4CAF50;
+            min-height: 25px;
+        }
+        /* Style TombolHP */
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            background-color: #444;
+            color: #fff;
+            border: 2px solid #666;
+            border-radius: 12px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .btn:active {
+            background-color: #666;
         }
     </style>
 </head>
 <body>
 
     <h1>Game Labirin</h1>
-    <p>Gunakan **Tombol Panah** di keyboard untuk mencapai kotak HIJAU!</p>
+    <p>Gunakan tombol di bawah untuk bergerak!</p>
     <div id="status"></div>
     <canvas id="mazeCanvas" width="400" height="400"></canvas>
+
+    <!-- Tombol Navigasi HP -->
+    <div class="controls">
+        <button class="btn" onclick="move('up')">▲</button>
+        <div class="row">
+            <button class="btn" onclick="move('left')">◄</button>
+            <button class="btn" onclick="move('down')">▼</button>
+            <button class="btn" onclick="move('right')">►</button>
+        </div>
+    </div>
 
     <script>
         const canvas = document.getElementById('mazeCanvas');
@@ -40,7 +81,6 @@
         const rows = 10;
         const cols = 10;
 
-        // Peta Labirin: 1 = Dinding, 0 = Jalan, 2 = Finish
         const map = [
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
@@ -54,26 +94,21 @@
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         ];
 
-        // Posisi Awal Pemain (Kolom 1, Baris 1)
         let player = { x: 1, y: 1 };
 
         function drawMap() {
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
-                    if (map[r][c] === 1) {
-                        ctx.fillStyle = '#555'; // Dinding
-                    } else if (map[r][c] === 2) {
-                        ctx.fillStyle = '#4CAF50'; // Finish
-                    } else {
-                        ctx.fillStyle = '#000'; // Jalan
-                    }
+                    if (map[r][c] === 1) ctx.fillStyle = '#555';
+                    else if (map[r][c] === 2) ctx.fillStyle = '#4CAF50';
+                    else ctx.fillStyle = '#000';
                     ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
                 }
             }
         }
 
         function drawPlayer() {
-            ctx.fillStyle = '#FF5722'; // Warna Pemain (Oranye)
+            ctx.fillStyle = '#FF5722';
             ctx.beginPath();
             ctx.arc(
                 player.x * tileSize + tileSize / 2,
@@ -91,31 +126,36 @@
             drawPlayer();
         }
 
-        window.addEventListener('keydown', (e) => {
+        function move(dir) {
             let newX = player.x;
             let newY = player.y;
 
-            if (e.key === 'ArrowUp') newY--;
-            if (e.key === 'ArrowDown') newY++;
-            if (e.key === 'ArrowLeft') newX--;
-            if (e.key === 'ArrowRight') newX++;
+            if (dir === 'up') newY--;
+            if (dir === 'down') newY++;
+            if (dir === 'left') newX--;
+            if (dir === 'right') newX++;
 
-            // Cek Tabrakan Dinding
             if (map[newY][newX] !== 1) {
                 player.x = newX;
                 player.y = newY;
             }
 
-            // Cek Kemenangan
             if (map[player.y][player.x] === 2) {
-                document.getElementById('status').innerText = 'Selamat! Kamu Berhasil Keluar!';
+                document.getElementById('status').innerText = 'Selamat! Kamu Menang! 🎉';
             }
 
             update();
+        }
+
+        // Kontrol Keyboard untuk Laptop/PC
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') move('up');
+            if (e.key === 'ArrowDown') move('down');
+            if (e.key === 'ArrowLeft') move('left');
+            if (e.key === 'ArrowRight') move('right');
         });
 
-        // Gambar pertama kali
         update();
     </script>
 </body>
-</html>
+</html>                        
